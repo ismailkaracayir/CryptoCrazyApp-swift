@@ -12,7 +12,9 @@ import RxSwift
 class ViewController: UIViewController  {
 
     
+    @IBOutlet weak var activityView: UIActivityIndicatorView!
     @IBOutlet weak var tableView: UITableView!
+    
     let cryptoVm = CryptoViewModel()
     let disposeBag = DisposeBag()
     var cryptoList : [Crypto] = []
@@ -26,6 +28,7 @@ class ViewController: UIViewController  {
     }
     
     private func setupBindings(){
+        cryptoVm.isLoading.bind(to: self.activityView.rx.isAnimating).disposed(by: disposeBag)
         cryptoVm.error.observe(on: MainScheduler.asyncInstance).subscribe { errorString in
             
             print(errorString)
@@ -52,8 +55,12 @@ extension ViewController : UITableViewDelegate , UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = UITableViewCell()
+        cell.backgroundColor = .black
         var content = cell.defaultContentConfiguration()
         content.text = cryptoList[indexPath.row].currency
+        content.textProperties.color = .white
+        content.secondaryTextProperties.color = .white
+
         content.secondaryText = cryptoList[indexPath.row].price
         cell.contentConfiguration = content
         return cell
